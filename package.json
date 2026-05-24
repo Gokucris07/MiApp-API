@@ -1,0 +1,35 @@
+{
+  "name": "miapp-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+ "scripts": {
+  "dev": "ts-node src/app.ts",
+  "build": "tsc",
+  "start": "node dist/app.js"
+},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Gokucris07/MiApp-API.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/Gokucris07/MiApp-API/issues"
+  },
+  "homepage": "https://github.com/Gokucris07/MiApp-API#readme",
+  "dependencies": {
+    "@types/express": "^5.0.6",
+    "@types/node": "^25.9.1",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "ts-node": "^10.9.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "typescript": "^6.0.3"
+  }
+}
