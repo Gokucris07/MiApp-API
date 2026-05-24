@@ -3,11 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {
-    "dev": "ts-node src/app.ts",
-    "build": "tsc",
-    "start": "node dist/app.js"
-  },
+ "scripts": {
+  "dev": "ts-node src/app.ts",
+  "build": "tsc",
+  "start": "node dist/app.js",
+  "postinstall": "prisma generate"
+},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Gokucris07/MiApp-API.git"
