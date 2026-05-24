@@ -1,4 +1,4 @@
-import { Router } from 'express';
+ import { Router } from 'express';
 import { getStores, getStoreById, getStoreRewards } from '../controllers/stores.controller';
 import { authMiddleware } from '../middlewares/auth.middleware';
 

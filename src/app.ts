@@ -2,6 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import authRoutes from './routes/auth.routes';
+import storesRoutes from './routes/stores.routes';
+import membershipsRoutes from './routes/memberships.routes';
+import transactionsRoutes from './routes/transactions.routes';
 
 dotenv.config();
 
@@ -12,6 +15,9 @@ app.use(express.json());
 
 // Rutas
 app.use('/auth', authRoutes);
+app.use('/stores', storesRoutes);
+app.use('/memberships', membershipsRoutes);
+app.use('/transactions', transactionsRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
