@@ -102,3 +102,7 @@ export const getMe = async (req: AuthRequest, res: Response): Promise<void> => {
     res.status(500).json({ error: 'SERVER_ERROR', message: 'Error del servidor. Intenta de nuevo.' });
   }
 };
+
+export const logout = async (req: AuthRequest, res: Response): Promise<void> => {
+  res.status(200).json({ message: 'Sesión cerrada correctamente.' });
+};
