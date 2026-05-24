@@ -5,6 +5,7 @@ import authRoutes from './routes/auth.routes';
 import storesRoutes from './routes/stores.routes';
 import membershipsRoutes from './routes/memberships.routes';
 import transactionsRoutes from './routes/transactions.routes';
+import ticketsRoutes from './routes/tickets.routes';
 
 dotenv.config();
 
@@ -18,7 +19,7 @@ app.use('/auth', authRoutes);
 app.use('/stores', storesRoutes);
 app.use('/memberships', membershipsRoutes);
 app.use('/transactions', transactionsRoutes);
-
+app.use('/tickets', ticketsRoutes);
 // Health check
 app.get('/health', (req, res) => {
   res.status(200).json({

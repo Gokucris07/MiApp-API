@@ -43,6 +43,7 @@ model Store {
   owner                 User          @relation("StoreOwner", fields: [owner_id], references: [id])
   memberships           Membership[]
   rewards               Reward[]
+  transactions          Transaction[]
 }
 
 model Membership {
@@ -66,18 +67,19 @@ model Membership {
 
 model Transaction {
   id             String     @id @default(uuid())
-  membership_id  String
+  membership_id  String?
+  store_id       String
   ticket_id      String     @unique
-  qr_token       String
+  qr_token       String     @unique
   qr_expires_at  DateTime
   qr_scanned_at  DateTime?
   amount_paid    Float
   points_earned  Int
   source         String     @default("manual")
   created_at     DateTime   @default(now())
-  membership     Membership @relation(fields: [membership_id], references: [id])
+  membership     Membership? @relation(fields: [membership_id], references: [id])
+  store          Store      @relation(fields: [store_id], references: [id])
 }
-
 model Reward {
   id           String       @id @default(uuid())
   store_id     String

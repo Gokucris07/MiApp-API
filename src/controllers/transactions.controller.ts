@@ -12,10 +12,9 @@ export const scanQR = async (req: AuthRequest, res: Response): Promise<void> => 
   }
 
   try {
-    // 1. Buscar la transacción por qr_token
-    const transaction = await prisma.transaction.findFirst({
+    const transaction = await prisma.transaction.findUnique({
       where: { qr_token },
-      include: { membership: { include: { store: true } } }
+      include: { store: true }
     });
 
     if (!transaction) {
@@ -23,37 +22,37 @@ export const scanQR = async (req: AuthRequest, res: Response): Promise<void> => 
       return;
     }
 
-    // 2. Verificar que no esté expirado
     if (new Date() > transaction.qr_expires_at) {
       res.status(410).json({ error: 'QR_EXPIRED', message: 'Este QR ha expirado. Pide al cajero que regenere el ticket.' });
       return;
     }
 
-    // 3. Verificar que no haya sido usado
     if (transaction.qr_scanned_at) {
       res.status(409).json({ error: 'ALREADY_USED', message: 'Este QR ya fue utilizado.' });
       return;
     }
 
-    const store = transaction.membership.store;
+    const store = transaction.store;
 
-    // 4. Verificar que el store esté activo
     if (!store.active) {
       res.status(403).json({ error: 'STORE_INACTIVE', message: 'Este local no tiene el programa activo.' });
       return;
     }
 
-    // 5. Buscar o crear membresía del usuario en este store
-    let membership = await prisma.membership.findUnique({
+    const membership = await prisma.membership.findUnique({
       where: { user_id_store_id: { user_id: req.userId!, store_id: store.id } }
     });
 
     if (!membership) {
-      res.status(404).json({ error: 'MEMBERSHIP_NOT_FOUND', message: 'No tienes membresía en este local', store_id: store.id, store_name: store.name });
+      res.status(404).json({
+        error: 'MEMBERSHIP_NOT_FOUND',
+        message: 'No tienes membresía en este local',
+        store_id: store.id,
+        store_name: store.name
+      });
       return;
     }
 
-    // 6. Calcular puntos
     const points_earned = calculatePoints(transaction.amount_paid, store.pts_per_peso);
     const new_balance = membership.points_balance + points_earned;
     const new_lifetime = membership.points_lifetime + points_earned;
@@ -66,7 +65,6 @@ export const scanQR = async (req: AuthRequest, res: Response): Promise<void> => 
     const points_expire_at = new Date();
     points_expire_at.setDate(points_expire_at.getDate() + store.points_validity_days);
 
-    // 7. Actualizar todo en una sola transacción DB
     await prisma.$transaction([
       prisma.membership.update({
         where: { id: membership.id },
@@ -80,23 +78,25 @@ export const scanQR = async (req: AuthRequest, res: Response): Promise<void> => 
       }),
       prisma.transaction.update({
         where: { id: transaction.id },
-        data: { qr_scanned_at: new Date() }
+        data: {
+          qr_scanned_at: new Date(),
+          membership_id: membership.id
+        }
       })
     ]);
-
-    const level_up = old_level !== new_level;
 
     res.status(200).json({
       points_earned,
       new_balance,
       store_name: store.name,
       store_id: store.id,
-      level_up,
+      level_up: old_level !== new_level,
       new_level,
       old_level
     });
 
-  } catch {
+  } catch (e) {
+    console.error(e);
     res.status(500).json({ error: 'SERVER_ERROR', message: 'Error del servidor. Intenta de nuevo.' });
   }
 };
