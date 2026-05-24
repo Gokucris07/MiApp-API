@@ -8,8 +8,9 @@ import transactionsRoutes from './routes/transactions.routes';
 import ticketsRoutes from './routes/tickets.routes';
 import redemptionsRoutes from './routes/redemptions.routes';
 import usersRoutes from './routes/users.routes';
-
+import { initSentry } from './utils/sentry';
 dotenv.config();
+initSentry();
 
 const app = express();
 
