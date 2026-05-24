@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
- "scripts": {
-  "dev": "ts-node src/app.ts",
-  "build": "tsc",
-  "start": "node dist/app.js"
-},
+  "scripts": {
+    "dev": "ts-node src/app.ts",
+    "build": "tsc",
+    "start": "node dist/app.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Gokucris07/MiApp-API.git"
@@ -21,11 +21,14 @@
   },
   "homepage": "https://github.com/Gokucris07/MiApp-API#readme",
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@prisma/client": "^5.22.0",
     "@types/express": "^5.0.6",
     "@types/node": "^25.9.1",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "express": "^5.2.1",
+    "prisma": "^5.22.0",
     "ts-node": "^10.9.2"
   },
   "devDependencies": {

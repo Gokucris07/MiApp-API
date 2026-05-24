@@ -1,0 +1,110 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+model User {
+  id                String        @id @default(uuid())
+  email             String        @unique
+  password_hash     String?
+  full_name         String
+  avatar_url        String?
+  auth_provider     String        @default("email")
+  provider_id       String?
+  push_token        String?
+  biometric_enabled Boolean       @default(false)
+  created_at        DateTime      @default(now())
+  updated_at        DateTime      @updatedAt
+  memberships       Membership[]
+  stores_owned      Store[]       @relation("StoreOwner")
+  redemptions_confirmed Redemption[] @relation("ConfirmedBy")
+}
+
+model Store {
+  id                    String        @id @default(uuid())
+  owner_id              String
+  name                  String
+  logo_url              String?
+  category              String        @default("otro")
+  address               String?
+  pts_per_peso          Float         @default(0.10)
+  bronze_threshold      Int           @default(0)
+  silver_threshold      Int           @default(300)
+  gold_threshold        Int           @default(700)
+  points_validity_days  Int           @default(365)
+  level_downgrade_days  Int           @default(90)
+  qr_expiry_hours       Int           @default(24)
+  pos_api_key           String?
+  active                Boolean       @default(true)
+  created_at            DateTime      @default(now())
+  owner                 User          @relation("StoreOwner", fields: [owner_id], references: [id])
+  memberships           Membership[]
+  rewards               Reward[]
+}
+
+model Membership {
+  id                  String        @id @default(uuid())
+  user_id             String
+  store_id            String
+  points_balance      Int           @default(0)
+  points_lifetime     Int           @default(0)
+  level               String        @default("bronze")
+  points_expire_at    DateTime
+  last_transaction_at DateTime?
+  joined_at           DateTime      @default(now())
+  active              Boolean       @default(true)
+  user                User          @relation(fields: [user_id], references: [id])
+  store               Store         @relation(fields: [store_id], references: [id])
+  transactions        Transaction[]
+  redemptions         Redemption[]
+
+  @@unique([user_id, store_id])
+}
+
+model Transaction {
+  id             String     @id @default(uuid())
+  membership_id  String
+  ticket_id      String     @unique
+  qr_token       String
+  qr_expires_at  DateTime
+  qr_scanned_at  DateTime?
+  amount_paid    Float
+  points_earned  Int
+  source         String     @default("manual")
+  created_at     DateTime   @default(now())
+  membership     Membership @relation(fields: [membership_id], references: [id])
+}
+
+model Reward {
+  id           String       @id @default(uuid())
+  store_id     String
+  name         String
+  description  String?
+  image_url    String?
+  points_cost  Int
+  min_level    String       @default("bronze")
+  stock        Int?
+  active       Boolean      @default(true)
+  expires_at   DateTime?
+  created_at   DateTime     @default(now())
+  store        Store        @relation(fields: [store_id], references: [id])
+  redemptions  Redemption[]
+}
+
+model Redemption {
+  id               String     @id @default(uuid())
+  membership_id    String
+  reward_id        String
+  qr_token         String     @unique
+  qr_expires_at    DateTime
+  confirmed_at     DateTime?
+  confirmed_by     String?
+  points_deducted  Int
+  created_at       DateTime   @default(now())
+  membership       Membership @relation(fields: [membership_id], references: [id])
+  reward           Reward     @relation(fields: [reward_id], references: [id])
+  confirmed_by_user User?     @relation("ConfirmedBy", fields: [confirmed_by], references: [id])
+}
